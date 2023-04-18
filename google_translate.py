@@ -4,6 +4,7 @@ from selenium.common.exceptions import *
 import selenium
 import json
 import time
+from polyglot.detect import Detector
 
 
 DRIVER_PATH = "./chromedriver_mac_arm64/chromedriver"
@@ -13,6 +14,47 @@ JSON_PATH = [
     "./data/sg_90k_part1_html_cleaned.json",
     "./data/sg_90k_part2_html_cleaned.json"
 ]
+
+class ShareGPTJSONProcessor():
+    def __init__(self, json_path: list, with_index: bool = True):
+        self.json_path = json_path
+        self.statistics = {}
+        self.dialogue_list = self.__preprocess(with_index)
+
+    def __preprocess(self, with_index):
+        """
+        Preprocess JSON files to list of dialogues.
+            dialogue: dict = {"id": str, "conversations": list[str], "turns": int}
+                "id": unique string for identifying the dialogue.
+                "conversations": list of utterances with corresponding speaker
+                "turns": total number of utterances in the dialogue
+        """
+        output = []
+        for json in self.json_path:
+            with open(json, "r") as original_json:
+                json_list = json.load(original_json)
+                for entry in json_list:
+                    # must have at least 2 elements: "id", "conversation"
+                    if len(entry) < 2:
+                        continue
+                    original_convs = entry["conversations"]
+                    if original_convs is None:
+                        continue
+                    concat_convs = []
+                    for i in range(0, len(original_convs)):
+                        if with_index:
+                            concat_convs += ["\"" + original_convs[i]["from"] + str(i) + "\"" + ":" + original_convs[i]["value"]]
+                        else:
+                            concat_convs += ["\"" + original_convs[i]["from"] + "\"" + ":" + original_convs[i]["value"]]
+                    entry["conversations"] = concat_convs
+                    entry["turns"] = len(original_convs)
+            output.append(json_list)
+        return output
+
+    def view_statistics(self):
+        "hello"
+    
+
 
 # 데이터 통계 (길이 분포, turn num, 언어 분포 ?, etc ..)
 # polyglot -> 처리할 때 통계 (얼마나 드랍되는지)
@@ -60,8 +102,10 @@ def set_proxy_server(proxy_retrieving_driver, trial=3, n=50):
             }
             driver = webdriver.Chrome(DRIVER_PATH)
             try:
-                driver.get("https://translate.google.co.in/")
-                return driver
+                if len(driver.find_elements(By.CSS_SELECTOR,'.error-code')) > 0:
+                    driver.quit()
+                    continue
+                return driver 
             except (WebDriverException, TimeoutException):
                 driver.quit()
     return None
