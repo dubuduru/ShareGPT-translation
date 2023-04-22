@@ -1,0 +1,112 @@
+From 5e664716ff5c84401188f671e04040c8b9458eba Mon Sep 17 00:00:00 2001
+From: Tomasz Mikus <tomasz@spiritai.com>
+Date: Thu, 10 Jun 2021 14:29:21 +0100
+Subject: [PATCH 1/3] Fix compilation on Apple M1 chips
+
+---
+ setup.py | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 2ddb83a..1382966 100755
+--- a/setup.py
++++ b/setup.py
+@@ -16,9 +16,9 @@
+ #
+ 
+ import io
+-import re
+ from os import path
+-
++import platform
++import re
+ import setuptools
+ 
+ HERE = path.abspath(path.dirname(__file__))
+@@ -66,6 +66,12 @@
+ 
+ include_dirs = [path.join(CLD2_PATH, "internal"), path.join(CLD2_PATH, "public")]
+ 
++compile_args = ["-w", "-O2", "-fPIC"]
++if platform.machine() == 'x86_64':
++    compile_args.append('-m64')
++elif platform.machine() == 'aarch64':
++    compile_args.append('-march=armv8-a')
++
+ module = setuptools.Extension(
+     # First arg (name) is the full name of the extension, including
+     # any packages - ie. not a filename or pathname, but Python dotted
+@@ -75,7 +81,7 @@
+     include_dirs=include_dirs,
+     language="c++",
+     # TODO: -m64 may break 32 bit builds
+-    extra_compile_args=["-w", "-O2", "-m64", "-fPIC"],
++    extra_compile_args=compile_args,
+ )
+ 
+ # We define version as PYCLD2_VERSION in the C++ module.
+
+From 26bbf56b0f8d2cd68feb4f63b52cce8aab30a4e7 Mon Sep 17 00:00:00 2001
+From: Tomasz Mikus <tomasz@spiritai.com>
+Date: Mon, 14 Jun 2021 18:21:30 +0100
+Subject: [PATCH 2/3] Fix m1 build
+
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 1382966..a394abe 100755
+--- a/setup.py
++++ b/setup.py
+@@ -69,7 +69,7 @@
+ compile_args = ["-w", "-O2", "-fPIC"]
+ if platform.machine() == 'x86_64':
+     compile_args.append('-m64')
+-elif platform.machine() == 'aarch64':
++elif platform.machine() == 'aarch64' or platform.machine() == 'arm64':
+     compile_args.append('-march=armv8-a')
+ 
+ module = setuptools.Extension(
+
+From cf8755a90d55d1fcf35235f9f65c89b9c5179d43 Mon Sep 17 00:00:00 2001
+From: Tomasz Mikus <tomasz@spiritai.com>
+Date: Mon, 14 Jun 2021 19:58:59 +0100
+Subject: [PATCH 3/3] Fix the problem with pycld2 on Mac M1.
+
+---
+ bindings/pycldmodule.cc | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/bindings/pycldmodule.cc b/bindings/pycldmodule.cc
+index df47ef7..7a8dec6 100644
+--- a/bindings/pycldmodule.cc
++++ b/bindings/pycldmodule.cc
+@@ -60,7 +60,6 @@ static PyObject *
+ detect(PyObject *self, PyObject *args, PyObject *kwArgs)
+ {
+   const char *bytes;
+-  int numBytes;
+ 
+   CLD2::CLDHints cldHints;
+   cldHints.tld_hint = 0;
+@@ -89,10 +88,9 @@ detect(PyObject *self, PyObject *args, PyObject *kwArgs)
+ 
+   if (!PyArg_ParseTupleAndKeywords(args,
+                                    kwArgs,
+-                                   "s#|izzzziiiiiiii",
++                                   "s|izzzziiiiiiii",
+                                    (char **) kwList,
+                                    &bytes,
+-                                   &numBytes,
+                                    &isPlainText,
+                                    &cldHints.tld_hint,
+                                    &hintLanguage,
+@@ -108,6 +106,7 @@ detect(PyObject *self, PyObject *args, PyObject *kwArgs)
+                                    &flagBestEffort)) {
+     return NULL;
+   }
++  int numBytes = strlen(bytes);
+ 
+   int flags = 0;
+   if (flagScoreAsQuads != 0) {

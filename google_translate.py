@@ -13,6 +13,7 @@ SAVE_PATH = [
     "./data/sg_90k_part2_html_cleaned_ko.json"
 ]
 
+
 FILE_NUM = 2
 
 Driver = webdriver.Chrome(DRIVER_PATH)
@@ -24,3 +25,4 @@ for i in range(0, FILE_NUM):
         result = Translator.translate(d["language"], LANG_TO, d["conversations"], d["speakers"])
         translations.append({"id": d["id"], "conversations": result})
         print(translations[-1])
+
