@@ -138,10 +138,12 @@ class ShareGPTJSONProcessor():
     
     
     def save_translations_as_json(self, translations, error_ids):
+        print_log("JsonProcessor", "Saving the translations to "+self.__translate_save_path+"...", "")
         with open(self.__translate_save_path, "w") as json_file_t:
-            json.dump(translations, json_file_t)
+            json.dump(translations, json_file_t, ensure_ascii=False)
         with open(self.__error_log_path, "w") as json_file_e:
             json.dump(error_ids, json_file_e)
+        print(" Done!")
 
     
     @classmethod

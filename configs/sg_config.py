@@ -13,8 +13,8 @@ TRANSLATE_PATH = [
     "./data/translated/part2.json"
 ]
 ERROR_LOG_PATH = [
-    "./data/sg_90k_part1_html_cleaned_ko_error_ids.json",
-    "./data/sg_90k_part2_html_cleaned_ko_error_ids.json"
+    "./data/error_log/part1.json",
+    "./data/error_log/part2.json",
 ]
 
 DRIVER_PATH = "./chromedriver_mac_arm64/chromedriver"
