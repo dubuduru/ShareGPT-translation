@@ -64,7 +64,7 @@ You can customize options by modifying `config.yml`.
 - `data`: data directory. In the directory path you write, there must be a sub-directory named `original`, and your json files to be translated should be located in the subdirectory.
 
 ### Using new config file
-For some reason, you might want to use 2 or more differnet configs at once. In such case, simply create one more `yaml` file (of course, use different name!). Then pass the path of config file as following:
+For some reason, you might want to use 2 or more differnet configs at once. In such case, simply create one more `yaml` file (of course, use different name!). Then pass the path of new config file as following:
 ```bash
 python main.py --config new_config_path.yml
 ```
@@ -84,7 +84,7 @@ for file in file_list:
     JsonProcessor.save_translations_as_json(translations, error_ids)
 ...
 ```
-Simply add `from_preprocessed` when you call `ShareGPTJSONProcessor` :D
+Simply add `from_preprocessed` when you call `ShareGPTJSONProcessor` 😁
 
 
 
