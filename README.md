@@ -32,19 +32,33 @@ You can customize options by modifying `config.yml`.
     - `lang_to`: code of target language of translation. (ex: `en`)
     - `chromedriver`: path for chrome driver, either relative path (from directory of `main.py`) or absolute path.
     - `include_errs`: whether to include not-translated dialogues in output file. If `yes`, dialogues that are not able to be translated would be stored, with well-translated dialogues.
-        > Why some dialogues cannot be translated?
+    
+        <details>
+        <summary>Why some dialogues cannot be translated?</summary>
+        <div markdown="1">
         There exsits several reasons that this code cannot tranlsate some dialogues:
         - This code does not split within one sentence. If the length of a sentence exceeds max_length, it simply does not translate the whole dialogue.
         - Chrome webdriver might crash in a sudden. When such bad thing happens, the code skips the dialogue.
-        > Why we need `include_errs` option?
+        </div>
+        </details>
+        <details>
+        <summary>Why we need `include_errs` option?</summary>
+        <div markdown="1">
         If you want to manually check all the not-translated dialogues and then correct them, this option would be useful. Use error logs in `./data/error_logs` to facilitate such chore.
+        </div>
+        </details>
     - `timeout`: max time to wait for getting translation result from webdriver. (secs)
     - `max_len`: max length of input text, in terms of character and url. **recommended not to change**
     - `overlap`: overlap between input texts. **recommended not to change**
 - `json_processor`
     - `use_polyglot`: whether to use python library `polyglot` to detect one source language per dialogue. If `no`, source language is set as "auto", which means google translate automatically detects the source language of input text. It would lead to undesired behaviour; each piece of one dialogue might be translated from different source language. Therefore `yes` is recommended if polyglot is available on your environment.
-        > Why `polyglot`?
+        
+        <details>
+        <summary>Why `polyglot`?</summary>
+        <div markdown="1">
         `polyglot` seems to be one of the best-performing language-detecting library in terms of accuracy and speed. (see [here](https://stackoverflow.com/questions/39142778/how-to-determine-the-language-of-a-piece-of-text))
+        </div>
+        </details>
 
 ## Check the result
 Translated files is saved in `./data/translated`. If you want to check which files are not translated and the reason of that, check files in `./data/error_logs`.
