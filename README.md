@@ -25,8 +25,10 @@ Data file (*.json) should be structured in following format:
 Each dialogue should have `id` and `conversations` as its key values. `conversations` is list of utterances, where each utterance consists of `from` (the name of speaker) and `value` (the contents spoken).
 
 Locate your original json files in `./data/original`, relative path from `main.py`.
+You can set your own data path by modifying or creating your config file. For more information, see next section.
 
-## Customize options
+## Custom Configs
+### Description of `config.yml`
 You can customize options by modifying `config.yml`.
 - `translator`
     - `lang_to`: code of target language of translation. (ex: `en`)
@@ -59,6 +61,14 @@ You can customize options by modifying `config.yml`.
         `polyglot` seems to be one of the best-performing language-detecting library in terms of accuracy and speed. (see [here](https://stackoverflow.com/questions/39142778/how-to-determine-the-language-of-a-piece-of-text))
         </div>
         </details>
+- `data`: data directory. In the directory path you write, there must be a sub-directory named `original`, and your json files to be translated should be located in the subdirectory.
+
+### Using new config file
+For some reason, you might want to use 2 or more differnet configs at once. In such case, simply create one more `yaml` file (of course, use different name!). Then pass the path of config file as following:
+```bash
+python main.py --config new_config_path.yml
+```
+If you do not pass `config` argument, the code will use deafult path: `./config.yml`.
 
 ## Check the result
 Translated files is saved in `./data/translated`. If you want to check which files are not translated and the reason of that, check files in `./data/error_logs`.
@@ -69,13 +79,12 @@ Once you run `main.py` and see the log that indicates the code finished preproce
 # main.py
 ...
 for file in file_list:
-    JsonProcessor = ShareGPTJSONProcessor.from_preprocessed(file)
+    JsonProcessor = ShareGPTJSONProcessor.from_preprocessed(file, config["json_preprocessor"])
     translations, error_ids = Translator.translate_dialogues(JsonProcessor.dialogues)
     JsonProcessor.save_translations_as_json(translations, error_ids)
 ...
 ```
-
-
+Simply add `from_preprocessed` when you call `ShareGPTJSONProcessor` :D
 
 
 

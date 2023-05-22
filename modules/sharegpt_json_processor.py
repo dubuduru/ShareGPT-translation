@@ -1,7 +1,10 @@
 import json
 import re
-import numpy as np
+import os
 from typing import *
+
+import numpy as np
+
 from .log_printer import *
 
 # TODO: print logs in better way ..
@@ -9,17 +12,18 @@ from .log_printer import *
 class ShareGPTJSONProcessor():
     def __init__(self, file, config, preprocessed = None):
         self.file = file
+        self.directory = config["data"]
+
+        self.__use_polyglot = config["use_polyglot"]
         self.__statistics = []
 
         if preprocessed is None:
-            self.__use_polyglot = config["use_polyglot"]
             if self.__use_polyglot:
                 from polyglot.detect import Detector
             self.dialogues = self.__preprocess()
         
         else:
             # from_preprocessed called
-            self.__use_polyglot = preprocessed["use_polyglot"]
             self.__statistics = preprocessed["statistics"]
             self.dialogues = preprocessed["dialogues"]
 
@@ -49,7 +53,7 @@ class ShareGPTJSONProcessor():
                 "turns": total number of utterances in the dialogue
         """
 
-        with open("./data/original/" + self.file, "r") as original_json:
+        with open(self.directory + "original/" + self.file, "r") as original_json:
             dict_list = json.load(original_json)
             print_log("JsonProcessor", "Preprocessing", "")
 
@@ -108,7 +112,7 @@ class ShareGPTJSONProcessor():
             print(" Done!")
         
         print_log("JsonProcessor", "Saving preprocessed file ...", end = "")
-        with open("./data/preprocessed/" + self.file, "w") as json_file_p:
+        with open(self.directory + "preprocessed/" + self.file, "w") as json_file_p:
             json.dump({"dialogues": dict_list, "statistics": self.__statistics, "use_polyglot": self.__use_polyglot}, json_file_p)
         print(" Done!")
 
@@ -136,23 +140,23 @@ class ShareGPTJSONProcessor():
     
     
     def save_translations_as_json(self, translations, error_ids):
-        print_log("JsonProcessor", "Saving the translations to "+ "./data/translated" + self.file +"...", "")
-        with open("./data/translated/" + self.file, "w") as json_file_t:
+        print_log("\nJsonProcessor", "Saving the translations to "+ self.directory + "translated/" + self.file +"...", "")
+        with open(self.directory + "translated/" + self.file, "w") as json_file_t:
             json.dump(translations, json_file_t, ensure_ascii=False)
-        with open("./data/error_log/" + self.file, "w") as json_file_e:
+        with open(self.directory + "error_log/" + self.file, "w") as json_file_e:
             json.dump(error_ids, json_file_e)
         print(" Done!")
 
     
     @classmethod
-    def from_preprocessed(cls, file):
+    def from_preprocessed(cls, file, config):
         ## Use this function only if you have preprocessed file made before
 
-        with open("./data/preprocessed/" + file, "r") as preprocessed:
+        with open(config["data"] + "preprocessed/" + file, "r") as preprocessed:
             print_log("JsonProcessor", "Loading from existing preprocessed file ...", "")
             preprocessed = json.load(preprocessed)
             print(" Done!")
-            return cls(file, None, preprocessed)
+            return cls(file, config, preprocessed)
 
             
 

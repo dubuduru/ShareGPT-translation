@@ -7,3 +7,4 @@ translator:
   overlap: [1000, 3000]
 json_processor:
   use_polyglot: no
+data: "./data/"
