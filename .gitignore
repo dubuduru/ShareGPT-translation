@@ -1,3 +1,4 @@
 data/
 chromedriver_mac_arm64/
 __pycache__/
+.DS_Store
