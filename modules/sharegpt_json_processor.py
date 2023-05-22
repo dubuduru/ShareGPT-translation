@@ -7,21 +7,19 @@ from .log_printer import *
 # TODO: print logs in better way ..
 
 class ShareGPTJSONProcessor():
-    def __init__(self, json_path: Optional[str], preprocess_save_path: Optional[str], translate_save_path: Optional[str], error_log_path: Optional[str], use_polyglot = False, preprocessed = None):
-        self.__json_path = json_path
-        self.__preprocess_save_path = preprocess_save_path
-        self.__translate_save_path = translate_save_path
-        self.__error_log_path = error_log_path
+    def __init__(self, file, config, preprocessed = None):
+        self.file = file
         self.__statistics = []
-        self.__use_polyglot = use_polyglot
-
-        if self.__use_polyglot:
-            from polyglot.detect import Detector
 
         if preprocessed is None:
+            self.__use_polyglot = config["use_polyglot"]
+            if self.__use_polyglot:
+                from polyglot.detect import Detector
             self.dialogues = self.__preprocess()
+        
         else:
             # from_preprocessed called
+            self.__use_polyglot = preprocessed["use_polyglot"]
             self.__statistics = preprocessed["statistics"]
             self.dialogues = preprocessed["dialogues"]
 
@@ -51,7 +49,7 @@ class ShareGPTJSONProcessor():
                 "turns": total number of utterances in the dialogue
         """
 
-        with open(self.__json_path, "r") as original_json:
+        with open("./data/original/" + self.file, "r") as original_json:
             dict_list = json.load(original_json)
             print_log("JsonProcessor", "Preprocessing", "")
 
@@ -110,8 +108,8 @@ class ShareGPTJSONProcessor():
             print(" Done!")
         
         print_log("JsonProcessor", "Saving preprocessed file ...", end = "")
-        with open(self.__preprocess_save_path, "w") as json_file_p:
-            json.dump({"dialogues": dict_list, "statistics": self.__statistics}, json_file_p)
+        with open("./data/preprocessed/" + self.file, "w") as json_file_p:
+            json.dump({"dialogues": dict_list, "statistics": self.__statistics, "use_polyglot": self.__use_polyglot}, json_file_p)
         print(" Done!")
 
         return dict_list
@@ -138,21 +136,23 @@ class ShareGPTJSONProcessor():
     
     
     def save_translations_as_json(self, translations, error_ids):
-        print_log("JsonProcessor", "Saving the translations to "+self.__translate_save_path+"...", "")
-        with open(self.__translate_save_path, "w") as json_file_t:
+        print_log("JsonProcessor", "Saving the translations to "+ "./data/translated" + self.file +"...", "")
+        with open("./data/translated/" + self.file, "w") as json_file_t:
             json.dump(translations, json_file_t, ensure_ascii=False)
-        with open(self.__error_log_path, "w") as json_file_e:
+        with open("./data/error_log/" + self.file, "w") as json_file_e:
             json.dump(error_ids, json_file_e)
         print(" Done!")
 
     
     @classmethod
-    def from_preprocessed(cls, preprocessed_path, translate_save_path, error_log_path, use_polyglot = False):
-        with open(preprocessed_path, "r") as preprocessed:
+    def from_preprocessed(cls, file):
+        ## Use this function only if you have preprocessed file made before
+
+        with open("./data/preprocessed/" + file, "r") as preprocessed:
             print_log("JsonProcessor", "Loading from existing preprocessed file ...", "")
             preprocessed = json.load(preprocessed)
             print(" Done!")
-            return cls(None, None, translate_save_path, error_log_path, use_polyglot, preprocessed)
+            return cls(file, None, preprocessed)
 
             
 

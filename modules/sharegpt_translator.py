@@ -4,21 +4,29 @@ import re
 import urllib.parse
 import numpy as np
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from .google_translate_agent import GoogleTranslateAgent
 from .log_printer import *
-
-from configs.sg_config import DRIVER_PATH
 
 
 class ShareGPTTranslator():
     
-    def __init__(self, default_lang, include_errs: bool = False, timeout: int = 600, max_len: Tuple[int, int] = (5000, 16300), overlap: Tuple[int, int] = (1000, 3000)):
-        self.__translator = GoogleTranslateAgent(webdriver.Chrome(DRIVER_PATH), timeout, max_len)
-        self.__include_errs = include_errs
-        self.__max_len = max_len
-        self.__overlap = overlap
+    def __init__(self, config):
+        options=Options()
+        options.headless = True
+        options.add_argument('--no-sandbox')
+        options.add_argument("--single-process")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument('--remote-debugging-port=9222')
 
-        self.default_lang = default_lang
+        self.__chrome_options = options
+        self.__driver_path = config["chromedriver"]
+        self.__translator = GoogleTranslateAgent(webdriver.Chrome(self.__driver_path, chrome_options=self.__chrome_options), config["timeout"], config["max_len"])
+        self.__include_errs = config["include_errs"]
+        self.__max_len = config["max_len"]
+        self.__overlap = config["overlap"]
+
+        self.default_lang = config["lang_to"]
 
     
     def change_driver_to(self, new_driver):
@@ -165,7 +173,7 @@ class ShareGPTTranslator():
         if state == 1:
             print_err("\"" +d["id"] + "\"" + " failed to translate due to webdriver-related problem")
             error_ids["translator_err"].append(d["id"])
-            self.change_driver_to(webdriver.Chrome(DRIVER_PATH))
+            self.change_driver_to(webdriver.Chrome(self.__driver_path, chrome_options=self.__chrome_options))
         elif state == 2:
             print_err("\"" +d["id"] + "\"" + " failed to merge splitted translations")
             error_ids["merging_failure"].append(d["id"])     

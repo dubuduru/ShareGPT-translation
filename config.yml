@@ -1,0 +1,9 @@
+translator:
+  lang_to: ko
+  chromedriver: "./chromedriver_mac_arm64/chromedriver"
+  include_errs: no
+  timeout: 600
+  max_len: [5000, 13600]
+  overlap: [1000, 3000]
+json_processor:
+  use_polyglot: no
