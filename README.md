@@ -38,15 +38,18 @@ You can customize options by modifying `config.yml`.
         <details>
         <summary>Why some dialogues cannot be translated?</summary>
         <div markdown="1">
-        There exsits several reasons that this code cannot tranlsate some dialogues:
+
         - This code does not split within one sentence. If the length of a sentence exceeds max_length, it simply does not translate the whole dialogue.
         - Chrome webdriver might crash in a sudden. When such bad thing happens, the code skips the dialogue.
+
         </div>
         </details>
         <details>
         <summary>Why we need `include_errs` option?</summary>
         <div markdown="1">
-        If you want to manually check all the not-translated dialogues and then correct them, this option would be useful. Use error logs in `./data/error_logs` to facilitate such chore.
+          
+        - If you want to manually check all the not-translated dialogues and then correct them, this option would be useful. Use error logs in `./data/error_logs` to facilitate such chore.
+          
         </div>
         </details>
     - `timeout`: max time to wait for getting translation result from webdriver. (secs)
@@ -58,8 +61,10 @@ You can customize options by modifying `config.yml`.
         <details>
         <summary>Why `polyglot`?</summary>
         <div markdown="1">
-        `polyglot` seems to be one of the best-performing language-detecting library in terms of accuracy and speed. (see [here](https://stackoverflow.com/questions/39142778/how-to-determine-the-language-of-a-piece-of-text))
-        </div>
+          
+        - `polyglot` seems to be one of the best-performing language-detecting library in terms of accuracy and speed. (see [here](https://stackoverflow.com/questions/39142778/how-to-determine-the-language-of-a-piece-of-text))
+        
+  </div>
         </details>
 - `data`: data directory. In the directory path you write, there must be a sub-directory named `original`, and your json files to be translated should be located in the subdirectory.
 
