@@ -2,9 +2,9 @@
 Code for translation of [ShareGPT 90k data](https://github.com/lm-sys/FastChat/issues/90).
 
 # How to Use
-## Prepare data
+## Prepare your data
 Prepare ShareGPT data or other data but in same format of ShareGPT 90k.
-Data file (*.json) should be structured in following format:
+Your data file (*.json) should be structured in following format:
 ```json
 [
   {
@@ -27,8 +27,8 @@ Each dialogue should have `id` and `conversations` as its key values. `conversat
 Locate your original json files in `./data/original`, relative path from `main.py`.
 You can set your own data path by modifying or creating your config file. For more information, see next section.
 
-## Custom Configs
-### Description of `config.yml`
+## Customize config files
+### Components of `config.yml`
 You can customize options by modifying `config.yml`.
 - `translator`
     - `lang_to`: code of target language of translation. (ex: `en`)
